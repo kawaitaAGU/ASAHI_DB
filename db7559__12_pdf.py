@@ -35,6 +35,9 @@ JAPANESE_FONT = _setup_font()
 
 st.set_page_config(page_title="🔍 学生指導用データベース", layout="wide")
 st.title("🔍 歯科医師国家試験データベースNDA☎️0525822007")
+###############################--- 表示フラグ（後でTrueに戻せば復帰できます）---
+SHOW_STD_CSV_BUTTON = False   # 通常CSVボタンを隠す
+SHOW_TEXT_BUTTON    = False   # 通常TXTボタンを隠す  
 
 # ===== 列名正規化 & 安全取得ユーティリティ =====
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -131,14 +134,15 @@ timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 file_prefix = f"{(query if query else '検索なし')}{timestamp}"
 
 # ===== CSV ダウンロード =====
-csv_buffer = io.StringIO()
-ensure_output_columns(df_filtered).to_csv(csv_buffer, index=False)
-st.download_button(
-    label="📥 ヒット結果をCSVダウンロード",
-    data=csv_buffer.getvalue(),
-    file_name=f"{file_prefix}.csv",
-    mime="text/csv"
-)
+if SHOW_STD_CSV_BUTTON:
+    csv_buffer = io.StringIO()
+    ensure_output_columns(df_filtered).to_csv(csv_buffer, index=False)
+    st.download_button(
+        label="📥 ヒット結果をCSVダウンロード",
+        data=csv_buffer.getvalue(),
+        file_name=f"{file_prefix}.csv",
+        mime="text/csv"
+    )
 
 # --------------------------------------------------------------------
 # ▼▼▼ ここから追加（最小変更）：GoodNotes用CSVユーティリティ＋ボタン ▼▼▼
@@ -290,16 +294,17 @@ def format_record_to_text(row: pd.Series) -> str:
     return "\n".join(parts)
 
 # ===== TXT ダウンロード =====
-txt_buffer = io.StringIO()
-for _, row in df_filtered.iterrows():
-    txt_buffer.write(format_record_to_text(row))
-    txt_buffer.write("\n\n" + "-"*40 + "\n\n")
-st.download_button(
-    label="📄 ヒット結果をTEXTダウンロード",
-    data=txt_buffer.getvalue(),
-    file_name=f"{file_prefix}.txt",
-    mime="text/plain"
-)
+if SHOW_TEXT_BUTTON:  # ← 追加
+    txt_buffer = io.StringIO()
+    for _, row in df_filtered.iterrows():
+        txt_buffer.write(format_record_to_text(row))
+        txt_buffer.write("\n\n" + "-"*40 + "\n\n")
+    st.download_button(
+        label="📄 ヒット結果をTEXTダウンロード",
+        data=txt_buffer.getvalue(),
+        file_name=f"{file_prefix}.txt",
+        mime="text/plain"
+    )
 
 # ===== PDF 作成（ページ先頭は必ず問題文から／画像は必ず表示）=====
 def create_pdf(records, progress=None, status=None, start_time=None):
