@@ -37,7 +37,8 @@ st.set_page_config(page_title="🔍 学生指導用データベース", layout="
 st.title("🔍 歯科医師国家試験データベースNDA☎️0525822007")
 ###############################--- 表示フラグ（後でTrueに戻せば復帰できます）---
 SHOW_STD_CSV_BUTTON = False   # 通常CSVボタンを隠す
-SHOW_TEXT_BUTTON    = False   # 通常TXTボタンを隠す  
+SHOW_TEXT_BUTTON    = False   # 通常TXTボタンを隠す
+SHOW_GOODNOTES_BUTTON = False  # 通常GOODNOTES_BUTTONボタンを隠す
 
 # ===== 列名正規化 & 安全取得ユーティリティ =====
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -237,18 +238,19 @@ def dataframe_to_goodnotes_bytes(df: pd.DataFrame,
     return buf.getvalue().encode("utf-8")
 
 # ▼ GoodNotesダウンロードボタン（既存CSVボタンの直下）
-st.download_button(
-    label="📥 GoodNotes用CSV（Front/Back）をダウンロード",
-    data=dataframe_to_goodnotes_bytes(
-        df_filtered,          # 検索結果をそのままFront/Back化
-        numbering="ABC",      # "123"にしたい場合はここを変更
-        add_labels=True,      # Back先頭に「正解: 」を付ける
-        add_meta=False,       # Back末尾に 科目分類/リンクURL を追記するなら True
-        overall_line_ending="lf",  # GoodNotesならLF推奨（Windows運用なら"crlf"も可）
-    ),
-    file_name=f"{file_prefix}_goodnotes.csv",
-    mime="text/csv",
-)
+if SHOW_GOODNOTES_BUTTON:   # ← 追加
+    st.download_button(
+        label="📥 GoodNotes用CSV（Front/Back）をダウンロード",
+        data=dataframe_to_goodnotes_bytes(
+            df_filtered,          # 検索結果をそのままFront/Back化
+            numbering="ABC",      # "123"にしたい場合はここを変更
+            add_labels=True,      # Back先頭に「正解: 」を付ける
+            add_meta=False,       # Back末尾に 科目分類/リンクURL を追記するなら True
+            overall_line_ending="lf",  # GoodNotesならLF推奨
+        ),
+        file_name=f"{file_prefix}_goodnotes.csv",
+        mime="text/csv",
+    )
 # --------------------------------------------------------------------
 
 # ===== TXT 整形 =====
