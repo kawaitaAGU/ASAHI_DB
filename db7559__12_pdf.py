@@ -34,7 +34,8 @@ def _setup_font():
 JAPANESE_FONT = _setup_font()
 
 st.set_page_config(page_title="🔍 学生指導用データベース", layout="wide")
-st.title("🔍 歯科医師国家試験データベースNDA☎️0525822007")
+st.title("🔍 歯科医師国家試験データベース97_119回
+NDA☎️0525822007")
 ###############################--- 表示フラグ（後でTrueに戻せば復帰できます）---
 SHOW_STD_CSV_BUTTON = False   # 通常CSVボタンを隠す
 SHOW_TEXT_BUTTON    = False   # 通常TXTボタンを隠す
